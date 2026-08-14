@@ -1,49 +1,44 @@
-# نام اپ و آیکون
+# نام «فرنو یار» و آیکون
 
-## نام نمایشی: فرنو یار
+## نام روی گوشی (فارسی دقیق)
 
-### اندروید
+بعد از `flutter create .` این کارها را انجام بده:
 
-1. فایل:
-   `android/app/src/main/AndroidManifest.xml`
+### AndroidManifest.xml
+مسیر: `android/app/src/main/AndroidManifest.xml`
 
-   در `<application>`:
+```xml
+android:label="فرنو یار"
+```
 
-   ```xml
-   android:label="فرنو یار"
-   ```
+داخل تگ `<application ...>`.
 
-2. اگر از `android/app/src/main/res/values/strings.xml` استفاده می‌کنی:
+### strings.xml (اگر وجود دارد)
+`android/app/src/main/res/values/strings.xml`:
 
-   ```xml
-   <string name="app_name">فرنو یار</string>
-   ```
+```xml
+<string name="app_name">فرنو یار</string>
+```
 
-3. در `pubspec.yaml` الان `name: farno_yar` است (شناسه پکیج داخلی؛ برای کاربر دیده نمی‌شود).
+## آیکون
 
-### آیکون (خودت طراحی کن)
+فایل آماده: `assets/icon.png` (طرح تراشه نارنجی روی زمینه تیره)
 
-اندازه پیشنهادی:
+جایگزین حرفه‌ای:
 
-- **۱۰۲۴×۱۰۲۴** پیکسل PNG شفاف (بهترین)
-- یا حداقل **۵۱۲×۵۱۲**
-
-ایده طراحی:
-
-- پس‌زمینه تیره (#0A0E17)
-- نماد مدار / مقاومت / تراشه با نارنجی (#F97316)
-- متن کوچک «فرنو» اختیاری
-
-مراحل:
-
-1. فایل را بگذار: `assets/icon.png`
-2. اجرا کن:
+1. تصویر مربع PNG شفاف ۱۰۲۴×۱۰۲۴ بساز
+2. جایگزین `assets/icon.png`
+3. اجرا:
 
 ```bash
-flutter pub get
 dart run flutter_launcher_icons
 ```
 
-3. دوباره APK بساز.
+اگر پکیج پیدا نشد:
 
-`flutter_launcher_icons` در `pubspec.yaml` از قبل تنظیم شده است.
+```bash
+flutter pub get
+dart run flutter_launcher_icons:main
+```
+
+سپس دوباره APK بساز.

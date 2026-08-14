@@ -52,23 +52,11 @@ class _OhmLawScreenState extends State<OhmLawScreen> {
           TextField(controller: rCtrl, decoration: const InputDecoration(labelText: 'مقاومت R (مثلاً 1k)'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
           const SizedBox(height: 16),
           ElevatedButton(onPressed: _calc, child: const Text('محاسبه')),
-          if (result != null) _resultBox(context, result!),
+          if (result != null) ResultBox(result!),
         ],
       ),
     );
   }
 }
 
-Widget _resultBox(BuildContext context, String text) {
-  return Container(
-    margin: const EdgeInsets.only(top: 16),
-    width: double.infinity,
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: AppColors.orange.withOpacity(0.12),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: AppColors.orange.withOpacity(0.35)),
-    ),
-    child: Text(text, style: TextStyle(fontSize: 16, height: 1.6, fontWeight: FontWeight.w600, color: context.cText)),
-  );
-}
+

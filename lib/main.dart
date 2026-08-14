@@ -8,7 +8,8 @@ import 'theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  final isDark = prefs.getBool('dark_mode') ?? true;
+  // پیش‌فرض: تم روز (روشن)
+  final isDark = prefs.getBool('dark_mode') ?? false;
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

@@ -86,12 +86,7 @@ class _SeriesParallelScreenState extends State<SeriesParallelScreen> {
           const SizedBox(height: 16),
           ElevatedButton(onPressed: _calc, child: const Text('محاسبه')),
           if (result != null)
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.12), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.orange.withOpacity(0.35))),
-              child: Text(result!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.cText, height: 1.5)),
-            ),
+            ResultBox(result!),
         ],
       ),
     );

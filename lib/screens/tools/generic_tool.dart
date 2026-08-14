@@ -7,6 +7,7 @@ class GenericToolScreen extends StatefulWidget {
   final List<String> fields;
   final String Function(List<String> vals) compute;
   final List<String>? hints;
+  final Color? accent;
 
   const GenericToolScreen({
     super.key,
@@ -15,6 +16,7 @@ class GenericToolScreen extends StatefulWidget {
     required this.fields,
     required this.compute,
     this.hints,
+    this.accent,
   });
 
   @override
@@ -40,9 +42,7 @@ class _GenericToolScreenState extends State<GenericToolScreen> {
   }
 
   void _run() {
-    setState(() {
-      result = widget.compute(ctrls.map((c) => c.text).toList());
-    });
+    setState(() => result = widget.compute(ctrls.map((c) => c.text).toList()));
   }
 
   @override
@@ -55,11 +55,12 @@ class _GenericToolScreenState extends State<GenericToolScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(widget.description, style: TextStyle(color: context.cMuted, height: 1.5)),
+          Text(widget.description, textAlign: TextAlign.right, style: TextStyle(color: context.cMuted, height: 1.55)),
           const SizedBox(height: 16),
           for (var i = 0; i < widget.fields.length; i++) ...[
             TextField(
               controller: ctrls[i],
+              textAlign: TextAlign.right,
               decoration: InputDecoration(
                 labelText: widget.fields[i],
                 hintText: widget.hints != null && i < widget.hints!.length ? widget.hints![i] : null,
@@ -69,18 +70,7 @@ class _GenericToolScreenState extends State<GenericToolScreen> {
             const SizedBox(height: 10),
           ],
           ElevatedButton(onPressed: _run, child: const Text('محاسبه')),
-          if (result != null)
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.orange.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.orange.withOpacity(0.35)),
-              ),
-              child: Text(result!, style: TextStyle(fontSize: 16, height: 1.6, fontWeight: FontWeight.w600, color: context.cText)),
-            ),
+          if (result != null) ResultBox(result!, accent: widget.accent),
         ],
       ),
     );

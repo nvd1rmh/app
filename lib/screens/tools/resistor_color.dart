@@ -142,33 +142,7 @@ class _ResistorColorScreenState extends State<ResistorColorScreen> {
             });
           }),
 
-          if (result != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.orange.withOpacity(0.2),
-                    AppColors.gold.withOpacity(0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.orange.withOpacity(0.4)),
-              ),
-              child: Text(
-                result!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: context.cText,
-                  height: 1.5,
-                ),
-              ),
-            ),
-          ],
+          if (result != null) ResultBox(result!),
         ],
       ),
     );

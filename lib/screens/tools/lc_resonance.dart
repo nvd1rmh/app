@@ -39,7 +39,7 @@ class _LcResonanceScreenState extends State<LcResonanceScreen> {
           const SizedBox(height: 16),
           ElevatedButton(onPressed: _calc, child: const Text('محاسبه')),
           if (result != null)
-            Container(margin: const EdgeInsets.only(top: 16), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.green.withOpacity(0.35))), child: Text(result!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: context.cText, height: 1.5))),
+            ResultBox(result!, accent: AppColors.green),
         ],
       ),
     );

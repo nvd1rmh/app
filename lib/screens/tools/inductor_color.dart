@@ -83,19 +83,7 @@ class _InductorColorScreenState extends State<InductorColorScreen> {
               _calc();
             });
           }),
-          if (result != null)
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppColors.cyan.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
-              ),
-              child: Text(
-                result!,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: context.cText),
+          if (result != null) ResultBox(result!, accent: AppColors.cyan),
               ),
             ),
         ],
