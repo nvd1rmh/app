@@ -50,7 +50,7 @@ class AppTheme {
         foregroundColor: AppColors.dText,
         titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.dText),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.dCard,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -79,7 +79,7 @@ class AppTheme {
         foregroundColor: AppColors.lText,
         titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.lText),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.lCard,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
