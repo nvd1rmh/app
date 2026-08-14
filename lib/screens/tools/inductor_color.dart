@@ -29,7 +29,6 @@ class _InductorColorScreenState extends State<InductorColorScreen> {
     final d1 = digitColors[b1]!;
     final d2 = digitColors[b2]!;
     final mult = indMultColors[b3] ?? 1.0;
-    // value in µH typically for color code
     final uh = (d1 * 10 + d2) * mult;
     setState(() => result = formatInductance(uh * 1e-6));
   }
@@ -38,7 +37,7 @@ class _InductorColorScreenState extends State<InductorColorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🌀 رنگ سلف'),
+        title: const Text('رنگ سلف'),
         leading: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: () => Navigator.pop(context)),
       ),
       body: ListView(
@@ -84,8 +83,6 @@ class _InductorColorScreenState extends State<InductorColorScreen> {
             });
           }),
           if (result != null) ResultBox(result!, accent: AppColors.cyan),
-              ),
-            ),
         ],
       ),
     );
