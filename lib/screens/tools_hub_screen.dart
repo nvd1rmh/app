@@ -177,7 +177,7 @@ class _CatCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          cat.subtitle,
+                          '${cat.tools.length} ابزار · لمس برای ورود',
                           style: TextStyle(fontSize: 12.5, color: context.cMuted, height: 1.35),
                         ),
                         const SizedBox(height: 6),
