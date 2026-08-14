@@ -64,7 +64,7 @@ void openTool(BuildContext context, String id) {
       break;
     // Placeholders for remaining tools (UI ready, logic can be extended)
     case 'res_e_series':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'نزدیک‌ترین E-series',
         description: 'مقاومت ایده‌آل را وارد کن تا نزدیک‌ترین مقدار استاندارد E24 نمایش داده شود.',
         fields: ['مقاومت ایده‌آل (اهم)'],
@@ -77,7 +77,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'res_zener':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'مقاومت سری زنر',
         description: 'Vin، Vz و Iz را وارد کن.',
         fields: ['Vin (ولت)', 'Vz (ولت)', 'Iz (میلی‌آمپر)'],
@@ -94,7 +94,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'cap_energy':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'انرژی خازن',
         description: 'ظرفیت و ولتاژ را وارد کن (E = ½CV²)',
         fields: ['ظرفیت (مثلاً 100uF)', 'ولتاژ (ولت)'],
@@ -105,7 +105,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'cap_rc':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'ثابت زمانی RC',
         description: 'τ = R × C',
         fields: ['مقاومت (اهم)', 'خازن (مثلاً 10uF)'],
@@ -113,7 +113,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'ind_color':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'رنگ سلف',
         description: 'رنگ‌ها را انتخاب کن (نسخه کامل رنگی به‌زودی)',
         fields: [],
@@ -121,7 +121,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'ind_energy':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'انرژی سلف',
         description: 'E = ½ L I²',
         fields: ['سلف (مثلاً 10mH)', 'جریان (آمپر)'],
@@ -129,7 +129,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'crystal':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'کریستال / اسیلاتور',
         description: 'فرکانس را وارد کن',
         fields: ['فرکانس (مثلاً 16MHz)'],
@@ -142,7 +142,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'filter_rc':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'فرکانس قطع فیلتر',
         description: 'fc = 1/(2πRC) یا R/(2πL)',
         fields: ['R (اهم)', 'C یا L'],
@@ -150,7 +150,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'wavelength':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'طول موج / آنتن',
         description: 'فرکانس را وارد کن',
         fields: ['فرکانس (MHz)'],
@@ -163,7 +163,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'ldo':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'دراپ رگولاتور',
         description: 'تلفات توان رگولاتور خطی',
         fields: ['Vin', 'Vout', 'I (آمپر)'],
@@ -178,7 +178,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'battery':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'عمر باتری',
         description: 'ظرفیت (mAh) و جریان مصرف (mA)',
         fields: ['ظرفیت (mAh)', 'جریان (mA)'],
@@ -192,7 +192,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'pwm':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'PWM → ولتاژ',
         description: 'Duty Cycle و ولتاژ تغذیه',
         fields: ['Duty (%)', 'Vsupply'],
@@ -205,7 +205,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'opamp':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'گین آپ‌آمپ',
         description: 'اینورتینگ: Av = -Rf/Rin  |  نان‌اینورتینگ: Av = 1+Rf/Rg',
         fields: ['Rin یا Rg', 'Rf'],
@@ -220,7 +220,7 @@ void openTool(BuildContext context, String id) {
       );
       break;
     case 'impedance':
-      page = const GenericToolScreen(
+      page = GenericToolScreen(
         title: 'امپدانس مدار',
         description: 'برای محاسبه کامل از ربات استفاده کن یا در نسخه بعدی تکمیل می‌شود.',
         fields: [],
