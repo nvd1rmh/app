@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'tools/ohm_law.dart';
 import 'tools/resistor_color.dart';
@@ -12,7 +13,9 @@ import 'tools/reactance.dart';
 import 'tools/timer555.dart';
 import 'tools/power_calc.dart';
 import 'tools/datasheet.dart';
+import 'tools/inductor_color.dart';
 import 'tools/generic_tool.dart';
+import '../utils/formatters.dart';
 
 void openTool(BuildContext context, String id) {
   Widget page;
@@ -62,82 +65,96 @@ void openTool(BuildContext context, String id) {
     case 'datasheet':
       page = const DatasheetScreen();
       break;
-    // Placeholders for remaining tools (UI ready, logic can be extended)
+    case 'ind_color':
+      page = const InductorColorScreen();
+      break;
     case 'res_e_series':
       page = GenericToolScreen(
-        title: 'نزدیک‌ترین E-series',
-        description: 'مقاومت ایده‌آل را وارد کن تا نزدیک‌ترین مقدار استاندارد E24 نمایش داده شود.',
-        fields: ['مقاومت ایده‌آل (اهم)'],
+        title: 'نزدیک‌ترین E24',
+        description: 'مقاومت ایده‌آل را وارد کن.',
+        fields: const ['مقاومت (مثلاً 4.7k)'],
         compute: (vals) {
-          final r = double.tryParse(vals[0].replaceAll(',', '.'));
-          if (r == null || r <= 0) return 'مقدار نامعتبر';
-          // simple nearest
-          return 'نزدیک‌ترین E24 ≈ ${r.toStringAsFixed(2)} اهم\n(پیاده‌سازی کامل در نسخه بعدی)';
+          final r = parseResistance(vals[0]);
+          if (r == null || r <= 0) return 'نامعتبر';
+          final n = findNearestE24(r);
+          return 'ورودی: ${formatResistance(r)}\nپایین: ${n[0] != null ? formatResistance(n[0]!) : "—"}\nبالا: ${n[1] != null ? formatResistance(n[1]!) : "—"}';
         },
       );
       break;
     case 'res_zener':
       page = GenericToolScreen(
         title: 'مقاومت سری زنر',
-        description: 'Vin، Vz و Iz را وارد کن.',
-        fields: ['Vin (ولت)', 'Vz (ولت)', 'Iz (میلی‌آمپر)'],
+        description: 'Vin، ولتاژ زنر و جریان زنر',
+        fields: const ['Vin (V)', 'Vz (V)', 'Iz (mA)'],
         compute: (vals) {
-          final vin = double.tryParse(vals[0].replaceAll(',', '.'));
-          final vz = double.tryParse(vals[1].replaceAll(',', '.'));
-          final iz = double.tryParse(vals[2].replaceAll(',', '.'));
-          if (vin == null || vz == null || iz == null || iz == 0) return 'ورودی نامعتبر';
-          final rs = (vin - vz) / (iz / 1000);
-          final pr = (vin - vz) * (iz / 1000);
-          final pz = vz * (iz / 1000);
-          return 'Rs = ${rs.toStringAsFixed(1)} اهم\nتوان مقاومت ≈ ${pr.toStringAsFixed(3)} وات\nتوان زنر ≈ ${pz.toStringAsFixed(3)} وات';
+          final vin = parseNumber(vals[0]);
+          final vz = parseNumber(vals[1]);
+          final iz = parseNumber(vals[2]);
+          if (vin == null || vz == null || iz == null || iz <= 0) return 'نامعتبر';
+          final r = (vin - vz) / (iz / 1000);
+          if (r < 0) return 'Vz نباید از Vin بیشتر باشد';
+          final p = (vin - vz) * (iz / 1000);
+          return 'R = ${formatResistance(r)}\nتوان مقاومت ≈ ${formatPower(p)}';
         },
       );
       break;
     case 'cap_energy':
       page = GenericToolScreen(
         title: 'انرژی خازن',
-        description: 'ظرفیت و ولتاژ را وارد کن (E = ½CV²)',
-        fields: ['ظرفیت (مثلاً 100uF)', 'ولتاژ (ولت)'],
+        description: 'E = ½ C V²',
+        fields: const ['ظرفیت C', 'ولتاژ V'],
+        hints: const ['100uF', '12'],
         compute: (vals) {
-          // simplified
-          return 'برای محاسبه دقیق از فرمت‌های واحد استفاده کن (در نسخه کامل).';
+          final c = parseCapacitance(vals[0]);
+          final v = parseNumber(vals[1]);
+          if (c == null || v == null) return 'نامعتبر';
+          final e = 0.5 * c * v * v;
+          return 'انرژی ≈ ${e < 1 ? "${(e * 1000).toStringAsFixed(3)} mJ" : "${e.toStringAsFixed(4)} J"}';
         },
       );
       break;
-    case 'cap_rc':
+    case 'rc_tau':
       page = GenericToolScreen(
         title: 'ثابت زمانی RC',
         description: 'τ = R × C',
-        fields: ['مقاومت (اهم)', 'خازن (مثلاً 10uF)'],
-        compute: (vals) => 'τ = R × C',
-      );
-      break;
-    case 'ind_color':
-      page = GenericToolScreen(
-        title: 'رنگ سلف',
-        description: 'رنگ‌ها را انتخاب کن (نسخه کامل رنگی به‌زودی)',
-        fields: [],
-        compute: (_) => 'از بخش مقاومت رنگی می‌توانی الگو بگیری.',
+        fields: const ['R', 'C'],
+        hints: const ['10k', '100nF'],
+        compute: (vals) {
+          final r = parseResistance(vals[0]);
+          final c = parseCapacitance(vals[1]);
+          if (r == null || c == null) return 'نامعتبر';
+          final t = r * c;
+          return 'τ = ${(t * 1000).toStringAsFixed(4)} ms\n≈ ${t.toStringAsFixed(6)} s\n۵τ ≈ ${(5 * t * 1000).toStringAsFixed(3)} ms';
+        },
       );
       break;
     case 'ind_energy':
       page = GenericToolScreen(
         title: 'انرژی سلف',
         description: 'E = ½ L I²',
-        fields: ['سلف (مثلاً 10mH)', 'جریان (آمپر)'],
-        compute: (_) => 'E = ½LI²',
+        fields: const ['L', 'I (آمپر)'],
+        hints: const ['10mH', '0.5'],
+        compute: (vals) {
+          final l = parseInductance(vals[0]);
+          final i = parseNumber(vals[1]);
+          if (l == null || i == null) return 'نامعتبر';
+          final e = 0.5 * l * i * i;
+          return 'انرژی ≈ ${e < 1 ? "${(e * 1000).toStringAsFixed(3)} mJ" : "${e.toStringAsFixed(4)} J"}';
+        },
       );
       break;
     case 'crystal':
       page = GenericToolScreen(
         title: 'کریستال / اسیلاتور',
         description: 'فرکانس را وارد کن',
-        fields: ['فرکانس (مثلاً 16MHz)'],
+        fields: const ['فرکانس'],
+        hints: const ['16MHz'],
         compute: (vals) {
-          final f = double.tryParse(vals[0].replaceAll(RegExp(r'[^0-9.]'), ''));
-          if (f == null) return 'نامعتبر';
-          final period = 1 / (f * 1e6);
-          return 'پریود ≈ ${(period * 1e9).toStringAsFixed(2)} ns';
+          final f = parseFrequency(vals[0]);
+          if (f == null || f <= 0) return 'نامعتبر';
+          final t = 1 / f;
+          final lambda = 299792458 / f;
+          return 'f = ${formatFrequency(f)}\nپریود = ${(t * 1e9).toStringAsFixed(3)} ns\nλ ≈ ${lambda >= 1 ? "${lambda.toStringAsFixed(3)} m" : "${(lambda * 100).toStringAsFixed(2)} cm"}';
         },
       );
       break;
@@ -145,35 +162,52 @@ void openTool(BuildContext context, String id) {
       page = GenericToolScreen(
         title: 'فرکانس قطع فیلتر',
         description: 'fc = 1/(2πRC) یا R/(2πL)',
-        fields: ['R (اهم)', 'C یا L'],
-        compute: (_) => 'fc = 1 / (2πRC)',
+        fields: const ['R', 'C یا L', 'نوع (C یا L)'],
+        hints: const ['10k', '100nF', 'C'],
+        compute: (vals) {
+          final r = parseResistance(vals[0]);
+          final type = vals[2].trim().toUpperCase();
+          if (r == null || r <= 0) return 'R نامعتبر';
+          if (type.startsWith('L')) {
+            final l = parseInductance(vals[1]);
+            if (l == null || l <= 0) return 'L نامعتبر';
+            final fc = r / (2 * math.pi * l);
+            return 'fc (RL) ≈ ${formatFrequency(fc)}';
+          }
+          final c = parseCapacitance(vals[1]);
+          if (c == null || c <= 0) return 'C نامعتبر';
+          final fc = 1 / (2 * math.pi * r * c);
+          return 'fc (RC) ≈ ${formatFrequency(fc)}';
+        },
       );
       break;
     case 'wavelength':
       page = GenericToolScreen(
         title: 'طول موج / آنتن',
         description: 'فرکانس را وارد کن',
-        fields: ['فرکانس (MHz)'],
+        fields: const ['فرکانس'],
+        hints: const ['433MHz'],
         compute: (vals) {
-          final f = double.tryParse(vals[0].replaceAll(',', '.'));
-          if (f == null || f == 0) return 'نامعتبر';
-          final lambda = 300 / f; // meters approx for MHz
-          return 'λ ≈ ${lambda.toStringAsFixed(2)} متر\nλ/2 ≈ ${(lambda / 2).toStringAsFixed(2)} متر\nλ/4 ≈ ${(lambda / 4).toStringAsFixed(2)} متر';
+          final f = parseFrequency(vals[0]);
+          if (f == null || f <= 0) return 'نامعتبر';
+          final lambda = 299792458 / f;
+          String fmt(double m) => m >= 1 ? '${m.toStringAsFixed(3)} m' : '${(m * 100).toStringAsFixed(2)} cm';
+          return 'λ = ${fmt(lambda)}\nλ/2 = ${fmt(lambda / 2)}\nλ/4 = ${fmt(lambda / 4)}';
         },
       );
       break;
     case 'ldo':
       page = GenericToolScreen(
         title: 'دراپ رگولاتور',
-        description: 'تلفات توان رگولاتور خطی',
-        fields: ['Vin', 'Vout', 'I (آمپر)'],
+        description: 'توان تلفاتی = (Vin − Vout) × I',
+        fields: const ['Vin', 'Vout', 'I (آمپر)'],
         compute: (vals) {
-          final vin = double.tryParse(vals[0].replaceAll(',', '.'));
-          final vout = double.tryParse(vals[1].replaceAll(',', '.'));
-          final i = double.tryParse(vals[2].replaceAll(',', '.'));
+          final vin = parseNumber(vals[0]);
+          final vout = parseNumber(vals[1]);
+          final i = parseNumber(vals[2]);
           if (vin == null || vout == null || i == null) return 'نامعتبر';
           final p = (vin - vout) * i;
-          return 'توان تلفاتی ≈ ${p.toStringAsFixed(3)} وات';
+          return 'تلفات ≈ ${formatPower(p)}\nراندمان تقریبی ≈ ${(vout / vin * 100).toStringAsFixed(1)}٪';
         },
       );
       break;
@@ -181,50 +215,55 @@ void openTool(BuildContext context, String id) {
       page = GenericToolScreen(
         title: 'عمر باتری',
         description: 'ظرفیت (mAh) و جریان مصرف (mA)',
-        fields: ['ظرفیت (mAh)', 'جریان (mA)'],
+        fields: const ['ظرفیت (mAh)', 'جریان (mA)'],
         compute: (vals) {
-          final cap = double.tryParse(vals[0].replaceAll(',', '.'));
-          final cur = double.tryParse(vals[1].replaceAll(',', '.'));
+          final cap = parseNumber(vals[0]);
+          final cur = parseNumber(vals[1]);
           if (cap == null || cur == null || cur == 0) return 'نامعتبر';
           final hours = cap / cur;
-          return 'عمر تقریبی ≈ ${hours.toStringAsFixed(1)} ساعت\n≈ ${(hours / 24).toStringAsFixed(1)} روز';
+          return 'عمر تقریبی ≈ ${hours.toStringAsFixed(1)} ساعت\n≈ ${(hours / 24).toStringAsFixed(2)} روز';
         },
       );
       break;
     case 'pwm':
       page = GenericToolScreen(
         title: 'PWM → ولتاژ',
-        description: 'Duty Cycle و ولتاژ تغذیه',
-        fields: ['Duty (%)', 'Vsupply'],
+        description: 'ولتاژ متوسط = Duty × Vsupply',
+        fields: const ['Duty (%)', 'Vsupply'],
         compute: (vals) {
-          final d = double.tryParse(vals[0].replaceAll(',', '.'));
-          final v = double.tryParse(vals[1].replaceAll(',', '.'));
+          final d = parseNumber(vals[0]);
+          final v = parseNumber(vals[1]);
           if (d == null || v == null) return 'نامعتبر';
-          return 'ولتاژ متوسط ≈ ${(d / 100 * v).toStringAsFixed(2)} ولت';
+          return 'Vavg ≈ ${(d / 100 * v).toStringAsFixed(3)} ولت';
         },
       );
       break;
     case 'opamp':
       page = GenericToolScreen(
         title: 'گین آپ‌آمپ',
-        description: 'اینورتینگ: Av = -Rf/Rin  |  نان‌اینورتینگ: Av = 1+Rf/Rg',
-        fields: ['Rin یا Rg', 'Rf'],
+        description: 'اینورتینگ: −Rf/Rin  |  نان‌اینورتینگ: 1+Rf/Rg',
+        fields: const ['Rin یا Rg', 'Rf'],
         compute: (vals) {
-          final r1 = double.tryParse(vals[0].replaceAll(',', '.'));
-          final rf = double.tryParse(vals[1].replaceAll(',', '.'));
+          final r1 = parseResistance(vals[0]);
+          final rf = parseResistance(vals[1]);
           if (r1 == null || rf == null || r1 == 0) return 'نامعتبر';
-          final inv = -rf / r1;
-          final non = 1 + rf / r1;
-          return 'گین اینورتینگ ≈ ${inv.toStringAsFixed(2)}\nگین نان‌اینورتینگ ≈ ${non.toStringAsFixed(2)}';
+          return 'گین اینورتینگ ≈ ${(-rf / r1).toStringAsFixed(3)}\nگین نان‌اینورتینگ ≈ ${(1 + rf / r1).toStringAsFixed(3)}';
         },
       );
       break;
     case 'impedance':
       page = GenericToolScreen(
-        title: 'امپدانس مدار',
-        description: 'برای محاسبه کامل از ربات استفاده کن یا در نسخه بعدی تکمیل می‌شود.',
-        fields: [],
-        compute: (_) => 'در حال توسعه',
+        title: 'امپدانس RL/RC سری',
+        description: 'R و X را وارد کن (Xc را منفی وارد کن)',
+        fields: const ['R (اهم)', 'X (اهم)'],
+        compute: (vals) {
+          final r = parseNumber(vals[0]);
+          final x = parseNumber(vals[1]);
+          if (r == null || x == null) return 'نامعتبر';
+          final z = math.sqrt(r * r + x * x);
+          final phase = math.atan2(x, r) * 180 / math.pi;
+          return '|Z| ≈ ${formatResistance(z)}\nفاز ≈ ${phase.toStringAsFixed(2)}°';
+        },
       );
       break;
     default:
@@ -233,6 +272,5 @@ void openTool(BuildContext context, String id) {
         body: const Center(child: Text('این ابزار به‌زودی اضافه می‌شود')),
       );
   }
-
   Navigator.push(context, MaterialPageRoute(builder: (_) => page));
 }

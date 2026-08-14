@@ -1,91 +1,49 @@
-# تغییر اسم به «فرنو یار» + آیکون دلخواه
+# نام اپ و آیکون
 
-## ۱) اسم برنامه (روی گوشی)
+## نام نمایشی: فرنو یار
 
-بعد از اینکه دستور زیر رو زدی:
+### اندروید
 
-```bash
-flutter create . --project-name farno_tools --org com.farno.tools
-```
+1. فایل:
+   `android/app/src/main/AndroidManifest.xml`
 
-این فایل رو باز کن:
+   در `<application>`:
 
-```
-android/app/src/main/AndroidManifest.xml
-```
-
-دنبال این خط بگرد:
-
-```xml
-android:label="farno_tools"
-```
-
-و عوضش کن به:
-
-```xml
-android:label="فرنو یار"
-```
-
-ذخیره کن.
-
----
-
-## ۲) آیکون برنامه (عکس خودت)
-
-### قدم‌ها:
-
-1. یک عکس مربعی خوب انتخاب کن (ترجیحاً **۱۰۲۴×۱۰۲۴** پیکسل، فرمت PNG)
-2. اسمش رو بگذار: `icon.png`
-3. بگذار داخل پوشه:
+   ```xml
+   android:label="فرنو یار"
    ```
-   farno_tools/assets/icon.png
-   ```
-   (پوشه `assets` از قبل هست)
 
-4. تو Command Prompt این دو دستور رو بزن:
+2. اگر از `android/app/src/main/res/values/strings.xml` استفاده می‌کنی:
+
+   ```xml
+   <string name="app_name">فرنو یار</string>
+   ```
+
+3. در `pubspec.yaml` الان `name: farno_yar` است (شناسه پکیج داخلی؛ برای کاربر دیده نمی‌شود).
+
+### آیکون (خودت طراحی کن)
+
+اندازه پیشنهادی:
+
+- **۱۰۲۴×۱۰۲۴** پیکسل PNG شفاف (بهترین)
+- یا حداقل **۵۱۲×۵۱۲**
+
+ایده طراحی:
+
+- پس‌زمینه تیره (#0A0E17)
+- نماد مدار / مقاومت / تراشه با نارنجی (#F97316)
+- متن کوچک «فرنو» اختیاری
+
+مراحل:
+
+1. فایل را بگذار: `assets/icon.png`
+2. اجرا کن:
 
 ```bash
 flutter pub get
-```
-
-```bash
 dart run flutter_launcher_icons
 ```
 
-5. بعد APK رو دوباره بساز:
+3. دوباره APK بساز.
 
-```bash
-flutter build apk --release
-```
-
----
-
-## نکات آیکون
-
-- عکس بهتره پس‌زمینه شفاف یا ساده داشته باشه
-- اندازه ایده‌آل: ۱۰۲۴×۱۰۲۴
-- اگر عکس خیلی شلوغ باشه، روی گوشی کوچک دیده می‌شه
-- رنگ پس‌زمینه آیکون تطبیقی (adaptive) روی اندروید: `#0B1220` (تیره مثل اپ)
-
----
-
-## خلاصه دستورات نهایی (به ترتیب)
-
-```bash
-cd Desktop\farno_tools
-
-flutter create . --project-name farno_tools --org com.farno.tools
-
-# اسم رو تو AndroidManifest عوض کن → فرنو یار
-
-# عکس icon.png رو تو assets بگذار
-
-flutter pub get
-dart run flutter_launcher_icons
-flutter build apk --release
-```
-
-فایل APK:
-```
-build\app\outputs\flutter-apk\app-release.apk
-```
+`flutter_launcher_icons` در `pubspec.yaml` از قبل تنظیم شده است.

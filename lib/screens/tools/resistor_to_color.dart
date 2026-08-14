@@ -1,126 +1,128 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../theme.dart';
 import '../../utils/formatters.dart';
-import 'resistor_color.dart' show colorHex;
 
 class ResistorToColorScreen extends StatefulWidget {
   const ResistorToColorScreen({super.key});
-
   @override
   State<ResistorToColorScreen> createState() => _ResistorToColorScreenState();
 }
 
 class _ResistorToColorScreenState extends State<ResistorToColorScreen> {
-  final _ctrl = TextEditingController();
-  List<String>? bands;
-  String? valueText;
+  final ctrl = TextEditingController();
+  List<String>? colors;
+  String? info;
+
+  Color _hex(String name) {
+    final c = colorHex[name];
+    return c != null ? Color(c.value) : Colors.grey;
+  }
 
   void _calc() {
-    final ohms = parseResistance(_ctrl.text);
-    if (ohms == null || ohms <= 0) {
+    final r = parseResistance(ctrl.text);
+    if (r == null || r <= 0) {
       setState(() {
-        bands = null;
-        valueText = 'مقدار نامعتبر';
+        colors = null;
+        info = 'مقدار نامعتبر';
       });
       return;
     }
-    final nearest = findNearestE24(ohms);
-    final target = nearest[1] ?? nearest[0] ?? ohms;
-    // encode 4-band
-    final digitNames = {0: 'مشکی', 1: 'قهوه‌ای', 2: 'قرمز', 3: 'نارنجی', 4: 'زرد', 5: 'سبز', 6: 'آبی', 7: 'بنفش', 8: 'خاکستری', 9: 'سفید'};
-    final multNames = {1.0: 'مشکی', 10.0: 'قهوه‌ای', 100.0: 'قرمز', 1000.0: 'نارنجی', 10000.0: 'زرد', 100000.0: 'سبز', 1000000.0: 'آبی', 0.1: 'طلایی', 0.01: 'نقره‌ای'};
-
-    double r = target;
-    int exp = 0;
-    if (r < 1) {
-      // gold/silver
-      if (r >= 0.1) {
-        final sig = (r * 10).round().clamp(1, 99);
-        final d1 = sig ~/ 10;
-        final d2 = sig % 10;
-        setState(() {
-          bands = [digitNames[d1]!, digitNames[d2]!, 'طلایی', 'طلایی'];
-          valueText = formatResistance(target);
-        });
-        return;
-      }
-    }
-    while (r >= 100) { r /= 10; exp++; }
-    while (r < 10 && r > 0) { r *= 10; exp--; }
-    final sig = r.round().clamp(10, 99);
-    final d1 = sig ~/ 10;
-    final d2 = sig % 10;
-    final multVal = (1.0 * (exp >= 0 ? (1 * _pow10(exp)) : (1.0 / _pow10(-exp))));
-    final multName = multNames[multVal] ?? 'مشکی';
+    final cols = valueToColors(r);
+    final near = findNearestE24(r);
+    final lower = near[0];
+    final higher = near[1];
     setState(() {
-      bands = [digitNames[d1]!, digitNames[d2]!, multName, 'طلایی'];
-      valueText = formatResistance(target);
+      colors = cols;
+      info = 'ورودی: ${formatResistance(r)}\n'
+          '${lower != null ? 'پایین‌تر E24: ${formatResistance(lower)}\n' : ''}'
+          '${higher != null ? 'بالاتر E24: ${formatResistance(higher)}' : ''}';
     });
-  }
-
-  int _pow10(int e) {
-    int r = 1;
-    for (int i = 0; i < e; i++) r *= 10;
-    return r;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('مقدار ← رنگ')),
+      appBar: AppBar(
+        title: const Text('مقدار ← رنگ'),
+        leading: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: () => Navigator.pop(context)),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           TextField(
-            controller: _ctrl,
+            controller: ctrl,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: GoogleFonts.vazirmatn(color: AppTheme.text),
             decoration: const InputDecoration(
-              labelText: 'مقدار مقاومت (مثلاً 4.7k یا 220)',
+              labelText: 'مقاومت (مثلاً 4.7k یا 4700)',
+              hintText: '10k',
             ),
+            onSubmitted: (_) => _calc(),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: _calc, child: const Text('تبدیل به رنگ')),
-          if (bands != null) ...[
-            const SizedBox(height: 28),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: const Color(0xFFC4A484),
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: bands!.map((c) {
-                  return Container(
-                    width: 22,
-                    height: 80,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: colorHex[c],
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.black54),
-                    ),
-                  );
-                }).toList(),
+          ElevatedButton(onPressed: _calc, child: const Text('محاسبه رنگ')),
+          if (colors != null) ...[
+            const SizedBox(height: 24),
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: Container(
+                height: 90,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4A574),
+                  borderRadius: BorderRadius.circular(45),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < colors!.length; i++) ...[
+                      if (i == 3) const SizedBox(width: 16),
+                      if (i > 0 && i < 3) const SizedBox(width: 10),
+                      Container(
+                        width: 14,
+                        height: 65,
+                        decoration: BoxDecoration(
+                          color: _hex(colors![i]),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              bands!.join(' · '),
-              textAlign: TextAlign.center,
-              style: GoogleFonts.vazirmatn(fontSize: 16, color: AppTheme.text, fontWeight: FontWeight.w600),
-            ),
-            if (valueText != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Text(
-                  valueText!,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.vazirmatn(fontSize: 20, color: AppTheme.accent, fontWeight: FontWeight.w800),
+            ...List.generate(colors!.length, (i) {
+              final labels = ['رقم ۱ (چپ)', 'رقم ۲', 'ضریب', 'تلرانس'];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _hex(colors![i]),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: context.cLine),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text('${labels[i]}: ${colors![i]}', style: TextStyle(color: context.cText, fontSize: 15)),
+                  ],
                 ),
+              );
+            }),
+          ],
+          if (info != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: context.cCard2,
+                borderRadius: BorderRadius.circular(14),
               ),
+              child: Text(info!, style: TextStyle(color: context.cText, height: 1.5)),
+            ),
           ],
         ],
       ),

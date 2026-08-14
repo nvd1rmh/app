@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../theme.dart';
 import '../../utils/formatters.dart';
 
 class SeriesParallelScreen extends StatefulWidget {
-  final String type; // R, C, L
+  final String type; // R C L
   const SeriesParallelScreen({super.key, required this.type});
-
   @override
   State<SeriesParallelScreen> createState() => _SeriesParallelScreenState();
 }
 
 class _SeriesParallelScreenState extends State<SeriesParallelScreen> {
-  final _ctrl = TextEditingController();
+  final ctrl = TextEditingController();
   bool series = true;
   String? result;
 
@@ -25,99 +23,75 @@ class _SeriesParallelScreenState extends State<SeriesParallelScreen> {
   }
 
   void _calc() {
-    final parts = _ctrl.text.split(RegExp(r'[,،\s\n]+')).where((s) => s.trim().isNotEmpty).toList();
-    if (parts.isEmpty) {
-      setState(() => result = 'حداقل یک مقدار وارد کن');
-      return;
-    }
-    final values = <double>[];
+    final parts = ctrl.text.split(RegExp(r'[,،\s]+')).where((s) => s.isNotEmpty);
+    final vals = <double>[];
     for (final p in parts) {
       double? v;
-      if (widget.type == 'C') v = parseCapacitance(p);
-      else if (widget.type == 'L') v = parseInductance(p);
-      else v = parseResistance(p);
-      if (v == null || v <= 0) {
-        setState(() => result = 'مقدار نامعتبر: $p');
-        return;
+      if (widget.type == 'C') {
+        v = parseCapacitance(p);
+      } else if (widget.type == 'L') {
+        v = parseInductance(p);
+      } else {
+        v = parseResistance(p);
       }
-      values.add(v);
+      if (v != null && v > 0) vals.add(v);
     }
-
-    double eq;
+    if (vals.isEmpty) {
+      setState(() => result = 'مقادیر نامعتبر');
+      return;
+    }
+    double out;
     if (series) {
       if (widget.type == 'C') {
-        // capacitors series: 1/Ceq = sum 1/C
-        eq = 1 / values.map((c) => 1 / c).reduce((a, b) => a + b);
+        out = 1.0 / vals.map((v) => 1.0 / v).reduce((a, b) => a + b);
       } else {
-        eq = values.reduce((a, b) => a + b);
+        out = vals.reduce((a, b) => a + b);
       }
     } else {
       if (widget.type == 'C') {
-        eq = values.reduce((a, b) => a + b);
+        out = vals.reduce((a, b) => a + b);
       } else {
-        eq = 1 / values.map((r) => 1 / r).reduce((a, b) => a + b);
+        out = 1.0 / vals.map((v) => 1.0 / v).reduce((a, b) => a + b);
       }
     }
-
-    String formatted;
-    if (widget.type == 'C') formatted = formatCapacitance(eq);
-    else if (widget.type == 'L') formatted = formatInductance(eq);
-    else formatted = formatResistance(eq);
-
-    setState(() => result = '${series ? "سری" : "موازی"} → $formatted');
+    String fmt;
+    if (widget.type == 'C') {
+      fmt = formatCapacitance(out);
+    } else if (widget.type == 'L') {
+      fmt = formatInductance(out);
+    } else {
+      fmt = formatResistance(out);
+    }
+    setState(() => result = '${series ? "سری" : "موازی"}: $fmt\nتعداد: ${vals.length}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title), leading: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: () => Navigator.pop(context))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Text('مقادیر را با فاصله یا ویرگول جدا کن', style: TextStyle(color: context.cMuted)),
+          const SizedBox(height: 12),
+          TextField(controller: ctrl, decoration: InputDecoration(labelText: 'مقادیر', hintText: widget.type == 'C' ? '100nF, 220nF' : '1k 2.2k 4.7k')),
+          const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(
-                child: ChoiceChip(
-                  label: const Text('سری'),
-                  selected: series,
-                  onSelected: (_) => setState(() => series = true),
-                  selectedColor: AppTheme.accent.withOpacity(0.3),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ChoiceChip(
-                  label: const Text('موازی'),
-                  selected: !series,
-                  onSelected: (_) => setState(() => series = false),
-                  selectedColor: AppTheme.accent.withOpacity(0.3),
-                ),
-              ),
+              ChoiceChip(label: const Text('سری'), selected: series, onSelected: (_) => setState(() => series = true)),
+              const SizedBox(width: 8),
+              ChoiceChip(label: const Text('موازی'), selected: !series, onSelected: (_) => setState(() => series = false)),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'مقادیر را با کاما یا خط جدید جدا کن\nمثال: 100, 220, 4.7k',
-            style: GoogleFonts.vazirmatn(color: AppTheme.muted, fontSize: 13),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _ctrl,
-            maxLines: 4,
-            style: GoogleFonts.vazirmatn(color: AppTheme.text),
-            decoration: const InputDecoration(labelText: 'مقادیر'),
-          ),
-          const SizedBox(height: 16),
           ElevatedButton(onPressed: _calc, child: const Text('محاسبه')),
-          if (result != null) ...[
-            const SizedBox(height: 24),
+          if (result != null)
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(color: AppTheme.card2, borderRadius: BorderRadius.circular(18)),
-              child: Text(result!, textAlign: TextAlign.center, style: GoogleFonts.vazirmatn(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.accent)),
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.12), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.orange.withOpacity(0.35))),
+              child: Text(result!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.cText, height: 1.5)),
             ),
-          ],
         ],
       ),
     );

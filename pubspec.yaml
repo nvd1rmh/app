@@ -1,7 +1,7 @@
-name: farno_tools
+name: farno_yar
 description: فرنو یار - ابزارهای کاربردی الکترونیک (آفلاین)
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -11,11 +11,9 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
-  flutter_svg: ^2.0.10+1
   shared_preferences: ^2.3.2
-  intl: ^0.20.3
+  url_launcher: ^6.3.0
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -27,8 +25,9 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/icon.png"
-  adaptive_icon_background: "#0B1220"
+  adaptive_icon_background: "#0A0E17"
   adaptive_icon_foreground: "assets/icon.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true

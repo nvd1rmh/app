@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../data/tools_data.dart';
 import '../theme.dart';
 import 'tool_router.dart';
@@ -13,61 +12,63 @@ class CategoryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('${category.emoji} ${category.title}'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_forward),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         itemCount: category.tools.length,
         itemBuilder: (context, i) {
-          final t = category.tools[i];
+          final tool = category.tools[i];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 10),
             child: Material(
-              color: AppTheme.card,
-              borderRadius: BorderRadius.circular(20),
+              color: context.cCard,
+              borderRadius: BorderRadius.circular(18),
               child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => openTool(context, t.id),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
+                borderRadius: BorderRadius.circular(18),
+                onTap: () => openTool(context, tool.id),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: context.cLine.withOpacity(0.45)),
+                  ),
                   child: Row(
                     children: [
                       Container(
-                        width: 52,
-                        height: 52,
+                        width: 44,
+                        height: 44,
                         decoration: BoxDecoration(
-                          color: t.color.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(14),
+                          color: tool.color.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(t.icon, color: t.color, size: 26),
+                        child: Icon(tool.icon, color: tool.color, size: 22),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              t.title,
-                              style: GoogleFonts.vazirmatn(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.text,
+                              tool.title,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: context.cText,
                               ),
                             ),
-                            if (t.subtitle.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                t.subtitle,
-                                style: GoogleFonts.vazirmatn(
-                                  fontSize: 13,
-                                  color: AppTheme.muted,
-                                ),
-                              ),
-                            ],
+                            const SizedBox(height: 2),
+                            Text(
+                              tool.subtitle,
+                              style: TextStyle(fontSize: 12, color: context.cMuted),
+                            ),
                           ],
                         ),
                       ),
-                      Icon(Icons.chevron_left, color: t.color),
+                      Icon(Icons.chevron_left, color: context.cDim),
                     ],
                   ),
                 ),
