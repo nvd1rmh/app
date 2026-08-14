@@ -1,5 +1,5 @@
 name: farno_tools
-description: فرنو یار - ابزارهای کاربردی الکترونیک (آفلاین)
+description: ÙØ±Ù†Ùˆ ÛŒØ§Ø± - Ø§Ø¨Ø²Ø§Ø±Ù‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±Ø¯ÛŒ Ø§Ù„Ú©ØªØ±ÙˆÙ†ÛŒÚ© (Ø¢ÙÙ„Ø§ÛŒÙ†)
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -15,7 +15,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_svg: ^2.0.10+1
   shared_preferences: ^2.3.2
-  intl: ^0.19.0
+  intl: ^0.20.3
 
 dev_dependencies:
   flutter_test:
