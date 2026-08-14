@@ -146,23 +146,39 @@ class ResultBox extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [a.withOpacity(0.18), a.withOpacity(0.06)],
+          colors: [a.withOpacity(0.22), a.withOpacity(0.05)],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: a.withOpacity(0.4), width: 1.2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: a.withOpacity(0.5), width: 1.4),
+        boxShadow: [
+          BoxShadow(color: a.withOpacity(0.18), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
       ),
-      child: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Text(
-          text,
-          textAlign: TextAlign.right,
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.75,
-            fontWeight: FontWeight.w700,
-            color: context.cText,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.bolt_rounded, size: 16, color: a),
+              const SizedBox(width: 6),
+              Text('نتیجه', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: a)),
+            ],
           ),
-        ),
+          const SizedBox(height: 10),
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: Text(
+              text,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.75,
+                fontWeight: FontWeight.w700,
+                color: context.cText,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

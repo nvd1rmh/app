@@ -9,6 +9,7 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text('${category.emoji} ${category.title}'),
@@ -23,53 +24,76 @@ class CategoryScreen extends StatelessWidget {
         itemBuilder: (context, i) {
           final tool = category.tools[i];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 11),
             child: Material(
-              color: context.cCard,
-              borderRadius: BorderRadius.circular(18),
+              color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () => openTool(context, tool.id),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Ink(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: context.cLine.withOpacity(0.45)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: tool.color.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(tool.icon, color: tool.color, size: 22),
+                    color: context.cCard,
+                    border: Border.all(color: tool.color.withOpacity(0.28)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: tool.color.withOpacity(isDark ? 0.12 : 0.07),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              tool.title,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: context.cText,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              tool.subtitle,
-                              style: TextStyle(fontSize: 12, color: context.cMuted),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_left, color: context.cDim),
                     ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: LinearGradient(
+                              colors: [
+                                tool.color.withOpacity(0.3),
+                                tool.color.withOpacity(0.08),
+                              ],
+                            ),
+                            border: Border.all(color: tool.color.withOpacity(0.45)),
+                          ),
+                          child: Icon(tool.icon, color: tool.color, size: 24),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                tool.title,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: context.cText,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                tool.subtitle,
+                                style: TextStyle(fontSize: 12, color: context.cMuted, height: 1.3),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: tool.color.withOpacity(0.12),
+                          ),
+                          child: Icon(Icons.chevron_left_rounded, color: tool.color, size: 22),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
