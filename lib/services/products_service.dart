@@ -10,7 +10,6 @@ class ProductsService {
   List<ProductInfo> _items = List.from(allProducts);
   List<ProductInfo> get items => _items;
 
-  /// از سرور بخوان؛ اگر نبود همان لیست محلی
   Future<void> load() async {
     if (!AppConfig.hasServer) {
       _items = List.from(allProducts);
@@ -23,13 +22,14 @@ class ProductsService {
       final res = await http.get(uri, headers: {
         'apikey': AppConfig.supabaseAnonKey,
         'Authorization': 'Bearer ${AppConfig.supabaseAnonKey}',
-      }).timeout(const Duration(seconds: 12));
+      }).timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) {
         _items = List.from(allProducts);
         return;
       }
       final list = jsonDecode(res.body) as List;
       if (list.isEmpty) {
+        // سرور خالی = از لیست داخلی استفاده کن تا اپ خالی نباشد
         _items = List.from(allProducts);
         return;
       }
@@ -40,9 +40,13 @@ class ProductsService {
         return ProductInfo(
           id: m['id']?.toString() ?? name,
           name: name,
-          prompt: m['prompt']?.toString() ?? local?.prompt ?? 'مقدار/نوع را وارد کنید',
-          exampleCount: m['example_count']?.toString() ?? local?.exampleCount ?? '',
-          imageFile: m['image_file']?.toString() ?? local?.imageFile ?? 'placeholder.jpg',
+          prompt: m['prompt']?.toString() ??
+              local?.prompt ??
+              'مقدار یا نوع را وارد کنید',
+          exampleCount:
+              m['example_count']?.toString() ?? local?.exampleCount ?? '',
+          imageFile: m['image_file']?.toString() ?? local?.imageFile ?? '',
+          imageUrl: m['image_url']?.toString(),
           price: m['price']?.toString(),
         );
       }).toList();

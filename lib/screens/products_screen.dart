@@ -178,17 +178,7 @@ class _ProductCard extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: Image.asset(
-                  product.assetPath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFF121A28),
-                    child: const Center(
-                      child: Icon(Icons.image_outlined,
-                          color: AppColors.cyan, size: 36),
-                    ),
-                  ),
-                ),
+                child: _ProductImage(product: product, iconSize: 36),
               ),
               Expanded(
                 flex: 2,
@@ -197,24 +187,16 @@ class _ProductCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        product.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 13),
+                      Center(
+                        child: Text(
+                          product.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 13),
+                        ),
                       ),
-                      const Spacer(),
-                      if (product.price != null && product.price!.isNotEmpty)
-                        Text(product.price!,
-                            style: const TextStyle(
-                                color: AppColors.orange,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11))
-                      else
-                        Text(product.exampleCount,
-                            style: TextStyle(
-                                fontSize: 10.5, color: context.cMuted)),
                     ],
                   ),
                 ),
@@ -292,15 +274,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
             borderRadius: BorderRadius.circular(16),
             child: AspectRatio(
               aspectRatio: 1.4,
-              child: Image.asset(
-                p.assetPath,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: const Color(0xFF121A28),
-                  child: const Icon(Icons.image_outlined,
-                      size: 48, color: AppColors.cyan),
-                ),
-              ),
+              child: _ProductImage(product: p, iconSize: 48),
             ),
           ),
           const SizedBox(height: 14),
@@ -369,4 +343,36 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
         shape: const CircleBorder(),
         child: IconButton(onPressed: on, icon: Icon(ic, color: AppColors.cyan)),
       );
+}
+
+
+class _ProductImage extends StatelessWidget {
+  final ProductInfo product;
+  final double iconSize;
+  const _ProductImage({required this.product, this.iconSize = 36});
+
+  @override
+  Widget build(BuildContext context) {
+    final placeholder = Container(
+      color: const Color(0xFF121A28),
+      child: Center(
+        child: Icon(Icons.image_outlined, color: AppColors.cyan, size: iconSize),
+      ),
+    );
+    if (product.hasNetworkImage) {
+      return Image.network(
+        product.imageUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
+    }
+    if (product.assetPath.isNotEmpty) {
+      return Image.asset(
+        product.assetPath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
+    }
+    return placeholder;
+  }
 }

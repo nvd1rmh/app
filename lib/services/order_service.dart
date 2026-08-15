@@ -25,12 +25,15 @@ class OrderRecord {
     required this.createdAt,
   });
 
+  /// وضعیت‌هایی که ادمین در Supabase می‌تواند بگذارد
   static const statusLabels = {
     'pending': '⏳ در حال بررسی',
-    'confirmed': '✅ تأیید / آماده‌سازی',
+    'confirmed': '✅ تأیید شد',
+    'preparing': '🔧 در حال آماده‌سازی',
+    'shipping': '🚚 در حال ارسال',
     'shipped': '🚚 ارسال شد',
     'delivered': '📦 تحویل شد',
-    'cancelled': '❌ لغو شد',
+    'cancelled': '❌ لغو / رد شد',
   };
 
   String get statusLabel => statusLabels[status] ?? status;
@@ -40,7 +43,6 @@ class OrderService {
   OrderService._();
   static final OrderService instance = OrderService._();
 
-  /// اول از دامنه Supabase (معمولاً در ایران بازتر) بعد Worker کلادفلر
   List<String> get _notifyUrls {
     final list = <String>[
       '${AppConfig.supabaseUrl}/functions/v1/telegram-order',
@@ -103,12 +105,8 @@ class OrderService {
               body: body,
             )
             .timeout(const Duration(seconds: 25));
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          return true;
-        }
-      } catch (_) {
-        // URL بعدی را امتحان کن
-      }
+        if (res.statusCode >= 200 && res.statusCode < 300) return true;
+      } catch (_) {}
     }
     return false;
   }
@@ -131,7 +129,6 @@ class OrderService {
       'tg_user': {'id': user.id, 'username': user.phone},
     };
 
-    // 1) ذخیره در Supabase (اصلی)
     if (AppConfig.hasServer) {
       try {
         final uri = Uri.parse('${AppConfig.restBase}/orders');
@@ -156,20 +153,16 @@ class OrderService {
             )
             .timeout(const Duration(seconds: 20));
         if (res.statusCode >= 400) {
-          return 'ثبت سفارش در سرور ناموفق بود (${res.statusCode}). جداول SQL را چک کن.';
+          return 'ثبت سفارش در سرور ناموفق بود (${res.statusCode}).';
         }
       } catch (_) {
-        return 'اتصال به Supabase برای ثبت سفارش برقرار نشد.';
+        return 'اتصال به سرور برای ثبت سفارش برقرار نشد.';
       }
     }
 
-    // 2) اطلاع به تلگرام (اگر نشد، سفارش باز هم ثبت شده)
     final notified = await _notifyTelegram(payload);
     await CartService.instance.clear();
-
-    if (!notified) {
-      return 'ORDER_SAVED_NO_TELEGRAM';
-    }
+    if (!notified) return 'ORDER_SAVED_NO_TELEGRAM';
     return null;
   }
 }
