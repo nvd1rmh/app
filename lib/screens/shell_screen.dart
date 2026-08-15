@@ -7,7 +7,7 @@ import 'account_screen.dart';
 import 'auth/login_screen.dart';
 import 'auth/register_screen.dart';
 import 'cart_screen.dart';
-import 'categories_screen.dart';
+import 'products_screen.dart';
 import 'history_screen.dart';
 import 'home_tab.dart';
 import 'tools_hub_screen.dart';
@@ -46,7 +46,7 @@ class _ShellScreenState extends State<ShellScreen> {
 
     final pages = [
       HomeTab(onOrderTap: goCategories),
-      CategoriesScreen(onNeedAuth: _refresh),
+      ProductsScreen(onNeedAuth: _refresh),
       CartScreen(onChanged: _refresh),
       const ToolsHubScreen(),
       HistoryScreen(onChanged: _refresh),
@@ -128,7 +128,7 @@ class _ShellScreenState extends State<ShellScreen> {
           child: Row(
             children: [
               _nav(0, Icons.home_rounded, 'خانه'),
-              _nav(1, Icons.grid_view_rounded, 'دسته'),
+              _nav(1, Icons.grid_view_rounded, 'قطعات'),
               _nav(2, Icons.shopping_bag_rounded, 'سبد', badge: cartN),
               _nav(3, Icons.build_rounded, 'ابزار'),
               _nav(4, Icons.receipt_long_rounded, 'تاریخچه'),
