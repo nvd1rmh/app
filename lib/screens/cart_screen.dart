@@ -26,7 +26,14 @@ class _CartScreenState extends State<CartScreen> {
     final err = await OrderService.instance.checkout();
     setState(() => _busy = false);
     if (!mounted) return;
-    if (err != null) {
+    if (err == 'ORDER_SAVED_NO_TELEGRAM') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('سفارش ثبت شد. اطلاع به تلگرام فعلاً نرسید — Edge Function را بساز.'),
+        backgroundColor: AppColors.gold,
+      ));
+      widget.onChanged();
+      setState(() {});
+    } else if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

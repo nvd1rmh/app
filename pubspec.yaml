@@ -1,7 +1,7 @@
 name: farno_yar
 description: فرنو یار - ابزارهای کاربردی الکترونیک
 publish_to: 'none'
-version: 1.6.1+9
+version: 1.7.0+11
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -34,3 +34,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon.png
+    - assets/parts/

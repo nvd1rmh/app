@@ -40,6 +40,16 @@ class OrderService {
   OrderService._();
   static final OrderService instance = OrderService._();
 
+  /// اول از دامنه Supabase (معمولاً در ایران بازتر) بعد Worker کلادفلر
+  List<String> get _notifyUrls {
+    final list = <String>[
+      '${AppConfig.supabaseUrl}/functions/v1/telegram-order',
+    ];
+    final cf = AppConfig.orderProxyUrl.trim().replaceAll(RegExp(r'/$'), '');
+    if (cf.startsWith('https://')) list.add(cf);
+    return list;
+  }
+
   Future<List<OrderRecord>> fetchHistory() async {
     final user = AuthService.instance.currentUser;
     if (user == null || !AppConfig.hasServer) return [];
@@ -78,66 +88,88 @@ class OrderService {
     }
   }
 
+  Future<bool> _notifyTelegram(Map<String, dynamic> payload) async {
+    final body = jsonEncode(payload);
+    for (final url in _notifyUrls) {
+      try {
+        final res = await http
+            .post(
+              Uri.parse(url),
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': AppConfig.supabaseAnonKey,
+                'Authorization': 'Bearer ${AppConfig.supabaseAnonKey}',
+              },
+              body: body,
+            )
+            .timeout(const Duration(seconds: 25));
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          return true;
+        }
+      } catch (_) {
+        // URL بعدی را امتحان کن
+      }
+    }
+    return false;
+  }
+
   Future<String?> checkout() async {
     final user = AuthService.instance.currentUser;
     if (user == null) return 'ابتدا وارد حساب شو.';
     if (CartService.instance.items.isEmpty) return 'سبد خرید خالی است.';
-    if (!AppConfig.hasOrderProxy) {
-      return 'آدرس Worker کلادفلر تنظیم نشده (orderProxyUrl).';
-    }
 
     final code =
         'FY${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     final itemsJson = CartService.instance.items.map((e) => e.toJson()).toList();
 
-    try {
-      final payload = {
-        'name': user.name,
-        'phone': user.phone,
-        'note':
-            '📱 سفارش از اپلیکیشن فرنو یار\n🔢 کد: $code\n📍 آدرس: ${user.address}',
-        'items': itemsJson,
-        'tg_user': {'id': user.id, 'username': user.phone},
-      };
-      final res = await http
-          .post(
-            Uri.parse(AppConfig.orderProxyUrl),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(payload),
-          )
-          .timeout(const Duration(seconds: 25));
-      if (res.statusCode >= 400) {
-        return 'ارسال به سرور سفارش ناموفق بود (${res.statusCode}). Worker را چک کن.';
-      }
-    } catch (e) {
-      return 'اتصال به پروکسی کلادفلر برقرار نشد. اینترنت را بررسی کن.';
-    }
+    final payload = {
+      'name': user.name,
+      'phone': user.phone,
+      'note':
+          '📱 سفارش از اپلیکیشن فرنو یار\n🔢 کد: $code\n📍 آدرس: ${user.address}',
+      'items': itemsJson,
+      'tg_user': {'id': user.id, 'username': user.phone},
+    };
 
+    // 1) ذخیره در Supabase (اصلی)
     if (AppConfig.hasServer) {
       try {
         final uri = Uri.parse('${AppConfig.restBase}/orders');
-        await http.post(
-          uri,
-          headers: {
-            'apikey': AppConfig.supabaseAnonKey,
-            'Authorization': 'Bearer ${user.token}',
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: jsonEncode({
-            'user_id': user.id,
-            'order_code': code,
-            'status': 'pending',
-            'items': itemsJson,
-            'name': user.name,
-            'phone': user.phone,
-            'address': user.address,
-          }),
-        );
-      } catch (_) {}
+        final res = await http
+            .post(
+              uri,
+              headers: {
+                'apikey': AppConfig.supabaseAnonKey,
+                'Authorization': 'Bearer ${user.token}',
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal',
+              },
+              body: jsonEncode({
+                'user_id': user.id,
+                'order_code': code,
+                'status': 'pending',
+                'items': itemsJson,
+                'name': user.name,
+                'phone': user.phone,
+                'address': user.address,
+              }),
+            )
+            .timeout(const Duration(seconds: 20));
+        if (res.statusCode >= 400) {
+          return 'ثبت سفارش در سرور ناموفق بود (${res.statusCode}). جداول SQL را چک کن.';
+        }
+      } catch (_) {
+        return 'اتصال به Supabase برای ثبت سفارش برقرار نشد.';
+      }
     }
 
+    // 2) اطلاع به تلگرام (اگر نشد، سفارش باز هم ثبت شده)
+    final notified = await _notifyTelegram(payload);
     await CartService.instance.clear();
+
+    if (!notified) {
+      return 'ORDER_SAVED_NO_TELEGRAM';
+    }
     return null;
   }
 }

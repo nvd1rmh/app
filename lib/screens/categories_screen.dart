@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/products_data.dart';
+import '../data/part_images.dart';
 import '../services/auth_service.dart';
 import '../services/cart_service.dart';
 import '../theme.dart';
@@ -42,7 +43,7 @@ class CategoriesScreen extends StatelessWidget {
               crossAxisCount: 2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.05,
+              childAspectRatio: 0.92,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, i) {
@@ -85,26 +86,45 @@ class CategoriesScreen extends StatelessWidget {
                         ],
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(meta.$1, style: const TextStyle(fontSize: 36)),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              g,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 14,
-                                color: context.cText,
-                              ),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                              child: PartImages.forCategory(g) != null
+                                  ? Image.asset(
+                                      PartImages.forCategory(g)!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Center(
+                                        child: Text(meta.$1, style: const TextStyle(fontSize: 36)),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(meta.$1, style: const TextStyle(fontSize: 36)),
+                                    ),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${categoryGroups[g]!.length} قطعه',
-                            style: TextStyle(fontSize: 11, color: context.cMuted),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  g,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    color: context.cText,
+                                  ),
+                                ),
+                                Text(
+                                  '${categoryGroups[g]!.length} قطعه',
+                                  style: TextStyle(fontSize: 10.5, color: context.cMuted),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -143,7 +163,7 @@ class CategoryProductsScreen extends StatelessWidget {
           crossAxisCount: 2,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 1.35,
+          childAspectRatio: 0.95,
         ),
         itemCount: list.length,
         itemBuilder: (context, i) {
@@ -166,21 +186,43 @@ class CategoryProductsScreen extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cyan.withOpacity(0.25)),
                 ),
+                clipBehavior: Clip.antiAlias,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5)),
-                    const Spacer(),
-                    Text(info?.exampleCount ?? '',
-                        style: TextStyle(fontSize: 11, color: context.cMuted)),
+                    Expanded(
+                      flex: 3,
+                      child: Image.asset(
+                        PartImages.forProduct(name) ?? 'assets/parts/cat_resistor.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const ColoredBox(
+                          color: Color(0xFF1A2233),
+                          child: Icon(Icons.memory, color: AppColors.cyan),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+                            const Spacer(),
+                            Text(info?.exampleCount ?? '',
+                                style: TextStyle(fontSize: 10, color: context.cMuted)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
