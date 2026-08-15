@@ -1,7 +1,7 @@
 name: farno_yar
 description: فرنو یار - ابزارهای کاربردی الکترونیک
 publish_to: 'none'
-version: 1.4.1+6
+version: 1.6.1+9
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

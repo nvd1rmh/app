@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../services/config.dart';
 import '../theme.dart';
 
 class HomeTab extends StatelessWidget {
-  final VoidCallback onAuthChanged;
-  const HomeTab({super.key, required this.onAuthChanged});
+  final VoidCallback onOrderTap;
+  const HomeTab({super.key, required this.onOrderTap});
 
   @override
   Widget build(BuildContext context) {
@@ -16,125 +15,130 @@ class HomeTab extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF060A12), const Color(0xFF0D1524)]
-              : [const Color(0xFFF2F7FF), const Color(0xFFE4EEF9)],
+              ? const [Color(0xFF04070E), Color(0xFF0A1628), Color(0xFF0C1E36)]
+              : const [Color(0xFFE3F2FF), Color(0xFFF7FAFD), Color(0xFFD6E9FB)],
         ),
       ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(flex: 2),
-            // لوگو چیپ
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.cyan.withOpacity(0.35),
-                    AppColors.orange.withOpacity(0.25),
-                  ],
+      child: Stack(
+        children: [
+          Positioned(top: 30, right: -40, child: _orb(140, AppColors.cyan.withOpacity(0.14))),
+          Positioned(bottom: 120, left: -50, child: _orb(180, AppColors.orange.withOpacity(0.12))),
+          Positioned(top: 180, left: 40, child: _orb(60, AppColors.cyan.withOpacity(0.08))),
+          SafeArea(
+            child: Column(
+              children: [
+                const Spacer(flex: 2),
+                Container(
+                  width: 108,
+                  height: 108,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(colors: [
+                      AppColors.cyan.withOpacity(0.45),
+                      AppColors.orange.withOpacity(0.3),
+                    ]),
+                    border: Border.all(color: AppColors.cyan, width: 2.4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.cyan.withOpacity(0.4),
+                        blurRadius: 32,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.memory_rounded, size: 52, color: Colors.white),
                 ),
-                border: Border.all(color: AppColors.cyan.withOpacity(0.55), width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.cyan.withOpacity(0.25),
-                    blurRadius: 24,
-                    spreadRadius: 2,
+                const SizedBox(height: 26),
+                ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [AppColors.cyan, Color(0xFF7DD3FC), AppColors.orange],
+                  ).createShader(b),
+                  child: const Text(
+                    'فرنو یار',
+                    style: TextStyle(
+                      fontSize: 54,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: -1.4,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'فروشگاه و ابزار الکترونیکی',
+                  style: TextStyle(
+                    color: context.cMuted,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                if (user != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'سلام ${user.name}',
+                    style: TextStyle(fontWeight: FontWeight.w800, color: context.cText),
                   ),
                 ],
-              ),
-              child: const Icon(Icons.memory_rounded, size: 44, color: AppColors.cyan),
-            ),
-            const SizedBox(height: 28),
-            // عنوان خفن
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [AppColors.cyan, Color(0xFF7DD3FC), AppColors.orange],
-              ).createShader(bounds),
-              child: const Text(
-                'فرنو یار',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: -1,
-                  height: 1.1,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'ابزارهای الکترونیکی و محاسبه‌گر',
-              style: TextStyle(
-                fontSize: 15,
-                color: context.cMuted,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 28),
-            if (user != null)
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 32),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: AppColors.cyan.withOpacity(0.1),
-                  border: Border.all(color: AppColors.cyan.withOpacity(0.35)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        'خوش آمدی ${user.name}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: context.cText,
+                const Spacer(flex: 2),
+                // دکمه ثبت سفارش خفن
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: GestureDetector(
+                    onTap: onOrderTap,
+                    child: Container(
+                      width: double.infinity,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF00C2FF), Color(0xFF0077FF), Color(0xFFFF7A3D)],
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.cyan.withOpacity(0.45),
+                            blurRadius: 22,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1.5),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.shopping_cart_checkout_rounded,
+                              color: Colors.white, size: 28),
+                          SizedBox(width: 12),
+                          Text(
+                            'ثبت سفارش',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  'برای سفارش و سبد خرید وارد حساب شو',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: context.cDim, fontSize: 13),
+                const SizedBox(height: 18),
+                Text(
+                  'قطعات الکترونیکی با چند کلیک',
+                  style: TextStyle(fontSize: 12, color: context.cDim),
                 ),
-              ),
-            if (!AppConfig.hasServer) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  'سرور آنلاین هنوز تنظیم نشده — بعد از قرار دادن آدرس API در config.dart ثبت‌نام فعال می‌شود.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: context.cDim),
-                ),
-              ),
-            ],
-            const Spacer(flex: 3),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'از نوار پایین وارد ابزارها شو',
-                style: TextStyle(fontSize: 12, color: context.cDim),
-              ),
+                const Spacer(flex: 2),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _orb(double s, Color c) =>
+      Container(width: s, height: s, decoration: BoxDecoration(shape: BoxShape.circle, color: c));
 }
