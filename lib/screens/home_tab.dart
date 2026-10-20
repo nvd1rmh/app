@@ -39,10 +39,10 @@ class HomeTab extends StatelessWidget {
                 ),
               )),
               const SizedBox(height: 18),
-              Text('V1.0.0  •  آفلاین و همیشه در دسترس', style: TextStyle(color: context.cDim, fontSize: 11, fontWeight: FontWeight.w700)),
+              Text('V1.0.0  •  ابزارهای تخصصی الکترونیک', style: TextStyle(color: context.cDim, fontSize: 11, fontWeight: FontWeight.w700)),
             ],
           )),
-        )),
+        ))),
       ]),
     );
   }
@@ -61,3 +61,4 @@ class HomeTab extends StatelessWidget {
 
   Widget _orb(double size, Color color) => Container(width: size, height: size, decoration: BoxDecoration(shape: BoxShape.circle, color: color));
 }
+
