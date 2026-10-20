@@ -34,7 +34,7 @@ flutter create . --project-name farno_yar --org com.farno
 در تگ application این را بگذار:
 
 ```xml
-android:label="فرنو یار"
+android:label="فرنو الکترونیک"
 ```
 
 ## ۴) بیلد کم‌حجم روی سیستم خودت

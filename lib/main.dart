@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/shell_screen.dart';
+import 'screens/app_gate.dart';
 import 'theme.dart';
 
 void main() async {
@@ -61,7 +61,7 @@ class _FarnoYarAppState extends State<FarnoYarApp> {
       isDark: _isDark,
       toggleTheme: toggleTheme,
       child: MaterialApp(
-        title: 'فرنو یار',
+        title: 'فرنو الکترونیک',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
@@ -79,7 +79,7 @@ class _FarnoYarAppState extends State<FarnoYarApp> {
             child: child!,
           );
         },
-        home: const ShellScreen(),
+        home: const AppGate(),
       ),
     );
   }

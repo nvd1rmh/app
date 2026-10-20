@@ -1,4 +1,4 @@
-# نام «فرنو یار» و آیکون
+# نام «فرنو الکترونیک» و آیکون
 
 ## نام روی گوشی (فارسی دقیق)
 
@@ -8,7 +8,7 @@
 مسیر: `android/app/src/main/AndroidManifest.xml`
 
 ```xml
-android:label="فرنو یار"
+android:label="فرنو الکترونیک"
 ```
 
 داخل تگ `<application ...>`.
@@ -17,7 +17,7 @@ android:label="فرنو یار"
 `android/app/src/main/res/values/strings.xml`:
 
 ```xml
-<string name="app_name">فرنو یار</string>
+<string name="app_name">فرنو الکترونیک</string>
 ```
 
 ## آیکون
@@ -42,3 +42,4 @@ dart run flutter_launcher_icons:main
 ```
 
 سپس دوباره APK بساز.
+

@@ -113,20 +113,20 @@ android {
 | فونت/آیکون کامل | `--tree-shake-icons` |
 | وابستگی اضافه | فقط shared_preferences + url_launcher |
 
-## نام نمایشی فارسی «فرنو یار»
+## نام نمایشی فارسی «فرنو الکترونیک»
 
 ### 1) `android/app/src/main/AndroidManifest.xml`
 
 ```xml
 <application
-    android:label="فرنو یار"
+    android:label="فرنو الکترونیک"
     ...>
 ```
 
 ### 2) اگر `strings.xml` داری:
 
 ```xml
-<string name="app_name">فرنو یار</string>
+<string name="app_name">فرنو الکترونیک</string>
 ```
 
 و در Manifest: `android:label="@string/app_name"`
@@ -149,3 +149,4 @@ dart run flutter_launcher_icons
 
 در تنظیمات بیلد MagicCode اگر گزینه **Split APK / ABI** هست روشن کن.
 اگر فقط یک APK Universal می‌دهد، فایل `app-arm64-v8a-release.apk` را از خروجی split استفاده کن، نه فایل universal.
+

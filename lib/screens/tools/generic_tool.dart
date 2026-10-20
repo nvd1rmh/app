@@ -60,7 +60,8 @@ class _GenericToolScreenState extends State<GenericToolScreen> {
           for (var i = 0; i < widget.fields.length; i++) ...[
             TextField(
               controller: ctrls[i],
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.ltr,
               decoration: InputDecoration(
                 labelText: widget.fields[i],
                 hintText: widget.hints != null && i < widget.hints!.length ? widget.hints![i] : null,

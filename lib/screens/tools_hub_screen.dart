@@ -3,19 +3,27 @@ import '../data/tools_data.dart';
 import '../theme.dart';
 import 'category_screen.dart';
 
-class ToolsHubScreen extends StatelessWidget {
+class ToolsHubScreen extends StatefulWidget {
   const ToolsHubScreen({super.key});
 
   @override
+  State<ToolsHubScreen> createState() => _ToolsHubScreenState();
+}
+
+class _ToolsHubScreenState extends State<ToolsHubScreen> {
+  String _query = '';
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final query = _query.trim().toLowerCase();
+    final categories = toolCategories.map((cat) => ToolCategory(
+      id: cat.id, title: cat.title, emoji: cat.emoji, color: cat.color,
+      tools: cat.tools.where((tool) => query.isEmpty || '${tool.title} ${tool.subtitle} ${cat.title}'.toLowerCase().contains(query)).toList(),
+    )).where((cat) => cat.tools.isNotEmpty).toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ابزارها'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_forward),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: const Text('میز کار الکترونیک'),
+        automaticallyImplyLeading: false,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
@@ -83,10 +91,23 @@ class ToolsHubScreen extends StatelessWidget {
               ],
             ),
           ),
-          ...List.generate(toolCategories.length, (i) {
-            final cat = toolCategories[i];
+          TextField(
+            onChanged: (value) => setState(() => _query = value),
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              hintText: 'جست‌وجوی ابزار، قطعه یا فرمول',
+              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.cyan),
+              suffixIcon: _query.isEmpty ? null : IconButton(icon: const Icon(Icons.close), onPressed: () => setState(() => _query = '')),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (query.isNotEmpty)
+            Padding(padding: const EdgeInsets.only(bottom: 12), child: Text('${categories.fold<int>(0, (sum, cat) => sum + cat.tools.length)} نتیجه برای «$_query»', style: TextStyle(color: context.cMuted, fontWeight: FontWeight.w700))),
+          ...List.generate(categories.length, (i) {
+            final cat = categories[i];
             return _CatCard(cat: cat);
           }),
+          if (categories.isEmpty) Padding(padding: const EdgeInsets.all(28), child: Center(child: Text('ابزاری پیدا نشد؛ عبارت دیگری را جست‌وجو کن.', style: TextStyle(color: context.cMuted)))),
         ],
       ),
     );
