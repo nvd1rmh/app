@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/app_gate.dart';
+import 'screens/shell_screen.dart';
 import 'theme.dart';
 
 void main() async {
